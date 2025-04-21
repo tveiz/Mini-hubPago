@@ -108,7 +108,7 @@ submitButton.MouseButton1Click:Connect(function()
             message.Text = "Key válida. Carregando menu..."
             wait(1)
             gui:Destroy()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/tveiz/MINI-HUB-PAGO2/refs/heads/main/Pago.v2"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/tveiz/Hubmini/refs/heads/main/Version2"))()
         end
     else
         message.Text = "Key inválida ou expirada."
