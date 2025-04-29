@@ -24,7 +24,7 @@ local keys = {
     ["g3k1o"] = "2025-04-27",
     ["s7u9e"] = "2025-04-27",
     ["v0n5i"] = "2025-04-27",
-    ["STAFF-ACCESS-92XJ7"] = "2030-04-27",
+    ["DONOsKeY"] = "2030-04-27",
 
     -- ADIÇÃO DE NOVAS KEYS
     ["KEY321"] = "2025-04-27",
@@ -51,7 +51,7 @@ local keys = {
     ["SUMMER-KEY"] = "2025-04-27",
     ["WINTER-KEY"] = "2025-04-27",
     ["SPRING-KEY"] = "2025-04-27",
-    ["AUTUMN-KEY"] = "2025-04-27",
+    ["STAFFSkey"] = "2025-05-29",
 }
 local usedHWIDs = {}
 
