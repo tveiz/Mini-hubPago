@@ -2,10 +2,10 @@
 local keys = {
     -- KEYS SEGURAS (não removidas)
     ["DONOsKeY"] = "2030-04-27",
-    ["STAFFskey"] = "2025-05-29",
+    ["STAFFskey"] = "2025-06-02",
 
     -- NOVAS KEYS GERADAS
-    ["a1b2c"] = "2025-05-29",
+    ["a1b2c"] = "2025-06-02",
     ["d3e4f"] = "2025-05-29",
     ["g5h6i"] = "2025-05-29",
     ["j7k8l"] = "2025-05-29",
