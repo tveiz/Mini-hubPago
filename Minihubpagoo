@@ -1,10 +1,8 @@
 -- CONFIGURAÇÕES
 local keys = {
-    -- KEYS SEGURAS (não removidas)
     ["DONOsKeY"] = "2030-04-27",
     ["STAFFskey"] = "2025-06-02",
 
-    -- NOVAS KEYS GERADAS
     ["a1b2c"] = "2025-05-02",
     ["d3e4f"] = "2025-05-02",
     ["g5h6i"] = "2025-05-07",
@@ -31,12 +29,14 @@ local keys = {
     ["r7s8t"] = "2025-05-29",
 }
 
-local usedHWIDs = {}
+local ignoreHWIDLock = {
+    ["DONOsKeY"] = true,
+    ["STAFFskey"] = true,
+}
 
 -- FUNÇÕES
 local function getHWID()
-    local id = game:GetService("RbxAnalyticsService"):GetClientId()
-    return id
+    return game:GetService("RbxAnalyticsService"):GetClientId()
 end
 
 local function isValidKey(inputKey)
@@ -50,16 +50,31 @@ local function isValidKey(inputKey)
     return false
 end
 
+local function getSavedHWID(inputKey)
+    local filename = "MiniHub_HWIDs.json"
+    if not isfile(filename) then return {} end
+    local data = readfile(filename)
+    return game:GetService("HttpService"):JSONDecode(data)
+end
+
+local function saveHWID(inputKey, hwid)
+    local filename = "MiniHub_HWIDs.json"
+    local hwidData = getSavedHWID()
+    hwidData[inputKey] = hwid
+    writefile(filename, game:GetService("HttpService"):JSONEncode(hwidData))
+end
+
 local function isHWIDUsed(inputKey, hwid)
-    return usedHWIDs[inputKey] and usedHWIDs[inputKey] ~= hwid
+    if ignoreHWIDLock[inputKey] then return false end
+    local saved = getSavedHWID()
+    return saved[inputKey] and saved[inputKey] ~= hwid
 end
 
 -- UI
 local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
+local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "KeyInterface"
 gui.ResetOnSpawn = false
-gui.Parent = game.CoreGui
 
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 320, 0, 170)
@@ -67,9 +82,7 @@ frame.Position = UDim2.new(0.5, -160, 0.5, -85)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 frame.BorderSizePixel = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-local frameStroke = Instance.new("UIStroke", frame)
-frameStroke.Color = Color3.fromRGB(80, 80, 80)
-frameStroke.Thickness = 2
+Instance.new("UIStroke", frame).Color = Color3.fromRGB(80, 80, 80)
 
 local textBox = Instance.new("TextBox", frame)
 textBox.Size = UDim2.new(0.85, 0, 0, 40)
@@ -109,7 +122,9 @@ submitButton.MouseButton1Click:Connect(function()
         if isHWIDUsed(input, hwid) then
             message.Text = "Essa key já foi usada em outro dispositivo!"
         else
-            usedHWIDs[input] = hwid
+            if not ignoreHWIDLock[input] then
+                saveHWID(input, hwid)
+            end
             message.Text = "Key válida. Carregando menu..."
             wait(1)
             gui:Destroy()
