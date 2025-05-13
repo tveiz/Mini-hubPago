@@ -1,136 +1,146 @@
--- CONFIGURAÇÕES
-local keys = {
-    ["DONOsKeY"] = "2030-04-27",
-    ["Keysolta188_882"] = "2025-06-10",
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local KeyInput = Instance.new("TextBox")
+local VerifyButton = Instance.new("TextButton")
+local StatusLabel = Instance.new("TextLabel")
 
-    ["KEY_9282736390183"] = "2025-06-16",
-    ["d3e4f"] = "2025-06-02",
-    ["g5h6i"] = "2025-06-07",
-    ["j7k8l"] = "2025-06-10",
-    ["m9n0o"] = "2030-06-29",
-    ["p1q2r"] = "2025-06-05",
-    ["s3t4u"] = "2025-05-29",
-    ["v5w6x"] = "2025-05-29",
-    ["y7z8a"] = "2025-05-29",
-    ["b9c0d"] = "2025-05-29",
-    ["e1f2g"] = "2025-05-29",
-    ["h3i4j"] = "2025-05-29",
-    ["k5l6m"] = "2025-05-29",
-    ["n7o8p"] = "2025-05-29",
-    ["q9r0s"] = "2025-05-29",
-    ["t1u2v"] = "2025-05-29",
-    ["w3x4y"] = "2025-05-29",
-    ["z5a6b"] = "2025-05-29",
-    ["c7d8e"] = "2025-05-29",
-    ["f9g0h"] = "2025-05-29",
-    ["i1j2k"] = "2025-05-29",
-    ["l3m4n"] = "2025-05-29",
-    ["o5p6q"] = "2025-05-29",
-    ["r7s8t"] = "2025-05-29",
-}
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local ignoreHWIDLock = {
-    ["DONOsKeY"] = true,
-    ["STAFFskey"] = true,
-}
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.Size = UDim2.new(0, 300, 0, 200)
 
--- FUNÇÕES
+Title.Parent = Frame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "ScriptsBinsAuth"
+Title.TextColor3 = Color3.fromRGB(56, 139, 253)
+Title.TextSize = 20
+
+KeyInput.Parent = Frame
+KeyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+KeyInput.BorderSizePixel = 0
+KeyInput.Position = UDim2.new(0.1, 0, 0.3, 0)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 40)
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.PlaceholderText = "Insira Sua Key"
+KeyInput.Text = ""
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 14
+
+VerifyButton.Parent = Frame
+VerifyButton.BackgroundColor3 = Color3.fromRGB(56, 139, 253)
+VerifyButton.BorderSizePixel = 0
+VerifyButton.Position = UDim2.new(0.25, 0, 0.6, 0)
+VerifyButton.Size = UDim2.new(0.5, 0, 0, 30)
+VerifyButton.Font = Enum.Font.GothamBold
+VerifyButton.Text = "Verificar Key"
+VerifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+VerifyButton.TextSize = 14
+
+StatusLabel.Parent = Frame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 0, 0.8, 0)
+StatusLabel.Size = UDim2.new(1, 0, 0, 20)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.TextSize = 14
+
 local function getHWID()
-    return game:GetService("RbxAnalyticsService"):GetClientId()
-end
+    local success, clientId = pcall(function()
+        return game:GetService("RbxAnalyticsService"):GetClientId()
+    end)
 
-local function isValidKey(inputKey)
-    local today = os.date("*t")
-    local keyDate = keys[inputKey]
-    if keyDate then
-        local y, m, d = keyDate:match("(%d+)-(%d+)-(%d+)")
-        local expTime = os.time({year=tonumber(y), month=tonumber(m), day=tonumber(d)})
-        return os.time(today) <= expTime
+    if success and clientId then
+        return clientId
+    else
+        return "HWID_ERROR"
     end
-    return false
 end
 
-local function getSavedHWID(inputKey)
-    local filename = "MiniHub_HWIDs.json"
-    if not isfile(filename) then return {} end
-    local data = readfile(filename)
-    return game:GetService("HttpService"):JSONDecode(data)
+local function getRequestFunction()
+    return (syn and syn.request) or (http and http.request) or (fluxus and fluxus.request) or request
 end
 
-local function saveHWID(inputKey, hwid)
-    local filename = "MiniHub_HWIDs.json"
-    local hwidData = getSavedHWID()
-    hwidData[inputKey] = hwid
-    writefile(filename, game:GetService("HttpService"):JSONEncode(hwidData))
-end
-
-local function isHWIDUsed(inputKey, hwid)
-    if ignoreHWIDLock[inputKey] then return false end
-    local saved = getSavedHWID()
-    return saved[inputKey] and saved[inputKey] ~= hwid
-end
-
--- UI
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "KeyInterface"
-gui.ResetOnSpawn = false
-
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 320, 0, 170)
-frame.Position = UDim2.new(0.5, -160, 0.5, -85)
-frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-frame.BorderSizePixel = 0
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", frame).Color = Color3.fromRGB(80, 80, 80)
-
-local textBox = Instance.new("TextBox", frame)
-textBox.Size = UDim2.new(0.85, 0, 0, 40)
-textBox.Position = UDim2.new(0.075, 0, 0.2, 0)
-textBox.PlaceholderText = "Insira a Key"
-textBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-textBox.TextColor3 = Color3.new(1, 1, 1)
-textBox.ClearTextOnFocus = false
-textBox.Font = Enum.Font.Gotham
-textBox.TextSize = 16
-Instance.new("UICorner", textBox).CornerRadius = UDim.new(0, 6)
-
-local submitButton = Instance.new("TextButton", frame)
-submitButton.Size = UDim2.new(0.85, 0, 0, 35)
-submitButton.Position = UDim2.new(0.075, 0, 0.55, 0)
-submitButton.Text = "Verificar"
-submitButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-submitButton.TextColor3 = Color3.new(1, 1, 1)
-submitButton.Font = Enum.Font.GothamBold
-submitButton.TextSize = 16
-Instance.new("UICorner", submitButton).CornerRadius = UDim.new(0, 6)
-
-local message = Instance.new("TextLabel", frame)
-message.Size = UDim2.new(1, 0, 0.2, 0)
-message.Position = UDim2.new(0, 0, 0.8, 0)
-message.BackgroundTransparency = 1
-message.TextColor3 = Color3.new(1, 1, 1)
-message.Text = ""
-message.Font = Enum.Font.Gotham
-message.TextSize = 14
-
--- VERIFICAÇÃO
-submitButton.MouseButton1Click:Connect(function()
-    local input = textBox.Text
+local function verifyKey(key)
+    local apiKey = "lsamwxC2M"
     local hwid = getHWID()
-    if isValidKey(input) then
-        if isHWIDUsed(input, hwid) then
-            message.Text = "Essa key já foi usada em outro dispositivo!"
+    local url = "https://scriptsbinsauth.vercel.app/api/verify-key"
+    local HttpService = game:GetService("HttpService")
+
+    local body = {
+        key = key,
+        hwid = hwid
+    }
+
+    local requestFunc = getRequestFunction()
+    if not requestFunc then
+        return false, "Executor Não Suportado"
+    end
+
+    local success, response = pcall(function()
+        return requestFunc({
+            Url = url,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json",
+                ["Authorization"] = "Bearer " .. apiKey
+            },
+            Body = HttpService:JSONEncode(body)
+        })
+    end)
+
+    if not success or not response then
+        return false, "Erro De Conexão Com o Servidor"
+    end
+
+    if response.StatusCode == 200 and response.Body then
+        local decodeSuccess, data = pcall(function()
+            return HttpService:JSONDecode(response.Body)
+        end)
+
+        if decodeSuccess and data then
+            return data.valid, data.message
         else
-            if not ignoreHWIDLock[input] then
-                saveHWID(input, hwid)
-            end
-            message.Text = "Key válida. Carregando menu..."
-            wait(1)
-            gui:Destroy()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/tveiz/Hubmini/refs/heads/main/Version2"))()
+            return false, "Resposta Inválida Do Servidor"
         end
     else
-        message.Text = "Key inválida ou expirada."
+        return false, "Erro De Conexão Com o Servidor"
+    end
+end
+
+VerifyButton.MouseButton1Click:Connect(function()
+    local key = KeyInput.Text
+
+    if key == "" then
+        StatusLabel.Text = "Por Favor Insira Uma Key"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+        return
+    end
+
+    VerifyButton.Text = "Verificando..."
+    StatusLabel.Text = "Verificando Key..."
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    local success, message = verifyKey(key)
+
+    if success then
+        StatusLabel.Text = message or "Key Válida"
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+        wait(2)
+        ScreenGui:Destroy()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/tveiz/Hubmini/refs/heads/main/Version2"))()
+    else
+        StatusLabel.Text = message or "Key Inválida"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        wait(2)
+        VerifyButton.Text = "Verificar Key"
     end
 end)
